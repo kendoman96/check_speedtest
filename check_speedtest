@@ -1,0 +1,14 @@
+#!/bin/bash
+
+DOWN=$(speedtest-cli | grep "Download:")
+UP=$(speedtest-cli | grep "Upload:")
+
+main ()
+        {
+
+        echo $DOWN
+        echo $UP
+        exit 0;
+
+        }
+main;
