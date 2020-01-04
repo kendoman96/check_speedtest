@@ -1,14 +1,50 @@
 #!/bin/bash
 
-DOWN=$(speedtest-cli | grep "Download:")
-UP=$(speedtest-cli | grep "Upload:")
+DOWN=$(cat out.txt | grep "Download:" | awk -F 'Mbit/s' '{print $1}' | awk -F '.' '{print $1}' | awk -F ':' '{print $2}')
+UP=$(cat out.txt | grep "Upload:" | awk -F 'Mbit/s' '{print $1}' | awk -F '.' '{print $1}' | awk -F ':' '{print $2}')
+
+echo $DOWN
+echo $UP
+
+good ()
+        {
+
+        echo "Speeds are good. D: $DOWN U: $UP Mb/s"
+
+        }
+
+bad ()
+        {
+
+        echo "Speeds are bad. D: $DOWN U: $UP Mb/s"
+
+        }
+
+warning ()
+        {
+
+        echo "Speeds are not s'good. D: $DOWN U: $UP Mb/s"
+
+        }
 
 main ()
         {
 
-        echo $DOWN
-        echo $UP
-        exit 0;
+        if [[ $DOWN -ge 150 ]]; then
+                if [[ $UP -ge 10 ]]; then
+                        echo good
+                        good;
+                fi
+        else
+                if [[ $DOWN -ge 75 ]]; then
+                        if [[ $UP -ge 5 ]]; then
+                                warning;
+                        else
+                                bad;
+                        fi
+                fi
+        fi
 
         }
+
 main;
