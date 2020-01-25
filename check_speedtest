@@ -6,21 +6,21 @@ UP=$(tail -n 1 /srv/http/log/speedtest.log | awk -F ',' '{print $2}')
 good ()
         {
 
-        echo "Speeds are good. D: $DOWN U: $UP Mb/s | https://mgh.solutions/logs/speedtest.log"
+        echo "Speeds are good. D: $DOWN U: $UP Mb/s | AVG Down: $AVGDOWN AVG Up: $AVGUP"
 
         }
 
 bad ()
         {
 
-        echo "Speeds are bad. D: $DOWN U: $UP Mb/s"
+        echo "Speeds are bad. D: $DOWN U: $UP Mb/s | AVG Down: $AVGDOWN AVG Up: $AVGUP"
 
         }
 
 warning ()
         {
 
-        echo "Speeds are not s'good. D: $DOWN U: $UP Mb/s"
+        echo "Speeds are not s'good. D: $DOWN U: $UP Mb/s | AVG Down: $AVGDOWN AVG Up: $AVGUP"
 
         }
 
@@ -45,4 +45,38 @@ main ()
 
         }
 
-main;
+average ()
+        {
+
+NUM=$(wc -l /srv/http/log/speedtest.log | awk -F '/srv/http/log/speedtest.log' '{print $1}')
+COUNT="$(($NUM-1))"
+TEST=2
+BASE=0
+
+while [ $TEST != $COUNT ]; do
+
+        TEMP=$(head -n $TEST /srv/http/log/speedtest.log | tail -1 | awk -F ',' '{print $1}')
+        BASE="$(($BASE+$TEMP))"
+        TEST="$(($TEST+1))"
+done
+
+
+AVGDOWN=$(($BASE / $COUNT))
+
+TEST=2
+BASE=0
+
+while [ $TEST != $COUNT ]; do
+
+        TEMP=$(head -n $TEST /srv/http/log/speedtest.log | tail -1 | awk -F ',' '{print $2}')
+        BASE="$(($BASE+$TEMP))"
+        TEST="$(($TEST+1))"
+done
+
+AVGUP=$(($BASE / $COUNT))
+
+        main;
+
+        }
+
+average;
