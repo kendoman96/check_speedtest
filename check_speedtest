@@ -28,14 +28,11 @@ main ()
         {
 
         if [[ $DOWN -ge 150 ]]; then
-        echo 1
                 if [[ $UP -ge 10 ]]; then
                         good;
                 fi
         else
-        echo 2
                 if [[ $DOWN -ge 75 ]]; then
-                echo 3
                         if [[ $UP -ge 5 ]]; then
                                 warning;
                         else
