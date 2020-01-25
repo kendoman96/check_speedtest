@@ -1,10 +1,7 @@
 #!/bin/bash
 
-DOWN=$(cat out.txt | grep "Download:" | awk -F 'Mbit/s' '{print $1}' | awk -F '.' '{print $1}' | awk -F ':' '{print $2}')
-UP=$(cat out.txt | grep "Upload:" | awk -F 'Mbit/s' '{print $1}' | awk -F '.' '{print $1}' | awk -F ':' '{print $2}')
-
-echo $DOWN
-echo $UP
+DOWN=$(tail -n 1 /speedtest.log | awk -F ',' '{print $1}')
+UP=$(tail -n 1 /speedtest.log | awk -F ',' '{print $2}')
 
 good ()
         {
@@ -32,7 +29,6 @@ main ()
 
         if [[ $DOWN -ge 150 ]]; then
                 if [[ $UP -ge 10 ]]; then
-                        echo good
                         good;
                 fi
         else
