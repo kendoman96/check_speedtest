@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DOWN=$(tail -n 1 test | awk -F ',' '{print $1}')
-UP=$(tail -n 1 test | awk -F ',' '{print $2}')
+DOWN=$(tail -n 1 /srv/http/log/speedtest.log | awk -F ',' '{print $1}')
+UP=$(tail -n 1 /srv/http/log/speedtest.log | awk -F ',' '{print $2}')
 
 good ()
         {
