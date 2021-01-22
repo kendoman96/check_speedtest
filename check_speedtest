@@ -1,39 +1,51 @@
 #!/bin/bash
 
-DOWN=$(tail -n 1 /srv/http/log/speedtest.log | awk -F ',' '{print $1}')
-UP=$(tail -n 1 /srv/http/log/speedtest.log | awk -F ',' '{print $2}')
+DOWN=$(cat /srv/http/log/speedtest.last | awk -F ',' '{print $1}')
+UP=$(cat /srv/http/log/speedtest.last | awk -F ', ' '{print $2}' | awk -F ',' '{print $1}')
+
+#echo $DOWN
+#echo $UP
 
 good ()
         {
 
-        echo "Speeds are good. D: $DOWN U: $UP Mb/s | AVG Down: $AVGDOWN AVG Up: $AVGUP"
+        echo "Speeds are good. D: $DOWN U: $UP Mb/s"
+        return 0
 
         }
 
 bad ()
         {
 
-        echo "Speeds are bad. D: $DOWN U: $UP Mb/s | AVG Down: $AVGDOWN AVG Up: $AVGUP"
+        echo "Speeds are bad. D: $DOWN U: $UP Mb/s"
+        return 2
 
         }
 
 warning ()
         {
 
-        echo "Speeds are not s'good. D: $DOWN U: $UP Mb/s | AVG Down: $AVGDOWN AVG Up: $AVGUP"
+        echo "Speeds are not s'good. D: $DOWN U: $UP Mb/s"
+        return 1
 
         }
 
 main ()
         {
 
-        if [[ $DOWN -ge 150 ]]; then
-                if [[ $UP -ge 10 ]]; then
+        if [[ $DOWN -ge 500 ]]; then
+                if [[ $UP -ge 400 ]]; then
                         good;
+                else
+                        if [[ $UP -ge 300 ]]; then
+                                warning;
+                        else
+                                bad;
+                        fi
                 fi
         else
-                if [[ $DOWN -ge 75 ]]; then
-                        if [[ $UP -ge 5 ]]; then
+                if [[ $DOWN -ge 400 ]]; then
+                        if [[ $UP -ge 300 ]]; then
                                 warning;
                         else
                                 bad;
@@ -45,38 +57,4 @@ main ()
 
         }
 
-average ()
-        {
-
-NUM=$(wc -l /srv/http/log/speedtest.log | awk -F '/srv/http/log/speedtest.log' '{print $1}')
-COUNT="$(($NUM-1))"
-TEST=2
-BASE=0
-
-while [ $TEST != $COUNT ]; do
-
-        TEMP=$(head -n $TEST /srv/http/log/speedtest.log | tail -1 | awk -F ',' '{print $1}')
-        BASE="$(($BASE+$TEMP))"
-        TEST="$(($TEST+1))"
-done
-
-
-AVGDOWN=$(($BASE / $COUNT))
-
-TEST=2
-BASE=0
-
-while [ $TEST != $COUNT ]; do
-
-        TEMP=$(head -n $TEST /srv/http/log/speedtest.log | tail -1 | awk -F ',' '{print $2}')
-        BASE="$(($BASE+$TEMP))"
-        TEST="$(($TEST+1))"
-done
-
-AVGUP=$(($BASE / $COUNT))
-
-        main;
-
-        }
-
-average;
+main;
